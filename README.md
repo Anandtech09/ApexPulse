@@ -38,7 +38,7 @@ ApexPulse/
 ### 1. Clone and navigate
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/Anandtech09/ApexPulse.git
 cd ApexPulse
 ```
 
