@@ -7,7 +7,7 @@ import { holdings } from "../config/holdings";
 
 const yahooFinance = new YahooFinance();
 
-// ── In-memory cache ────────────────────────────────────────────────
+// In-memory cache 
 interface CacheEntry {
   data: Record<string, FundamentalsData>;
   fetchedAt: number;
@@ -101,7 +101,18 @@ async function fetchOneFundamentals(
     const yahooTicker = holding?.ticker;
     if (yahooTicker) {
       try {
-        const quote = await yahooFinance.quote(yahooTicker);
+        const quote = await yahooFinance.quote(
+          yahooTicker,
+          {},
+          {
+            fetchOptions: {
+              headers: {
+                "User-Agent":
+                  config.googleFinance.userAgent,
+              },
+            },
+          }
+        );
         if (result.peRatio === null && quote && typeof quote.trailingPE === "number") {
           result.peRatio = quote.trailingPE;
         }

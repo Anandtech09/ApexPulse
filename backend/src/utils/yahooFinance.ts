@@ -4,7 +4,7 @@ import { config } from "../config";
 
 const yahooFinance = new YahooFinance();
 
-// ── In-memory cache ────────────────────────────────────────────────
+// In-memory cache
 interface CacheEntry {
   data: Record<string, QuoteData>;
   fetchedAt: number;
@@ -17,7 +17,7 @@ function isCacheFresh(): boolean {
   return Date.now() - cache.fetchedAt < config.cache.priceTtl;
 }
 
-// ── Main fetch function ────────────────────────────────────────────
+// Main fetch function
 
 /**
  * Fetches live current market prices for all given tickers in one
@@ -37,9 +37,18 @@ export async function fetchPrices(
   }
 
   try {
-    // yahoo-finance2 returns a union type when given an array of tickers.
-    // We cast via unknown to access the well-known quote fields cleanly.
-    const raw = await yahooFinance.quote(tickers) as unknown as Array<{
+    const raw = await yahooFinance.quote(
+      tickers,
+      {},
+      {
+        fetchOptions: {
+          headers: {
+            "User-Agent":
+              config.googleFinance.userAgent,
+          },
+        },
+      }
+    ) as unknown as Array<{
       symbol: string;
       regularMarketPrice: number;
       regularMarketChange: number;
@@ -65,7 +74,7 @@ export async function fetchPrices(
         change: q.regularMarketChange ?? 0,
         changePercent: q.regularMarketChangePercent ?? 0,
         fetchedAt: now,
-        marketCap: q.marketCap ? q.marketCap / 10000000 : null, // Convert to Crores
+        marketCap: q.marketCap ? q.marketCap / 10000000 : null,
         bookValue: q.bookValue ?? null,
         priceToBook: q.priceToBook ?? null,
         dayHigh: q.regularMarketDayHigh ?? null,
