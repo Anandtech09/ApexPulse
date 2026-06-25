@@ -26,6 +26,14 @@ ApexPulse/
 
 ---
 
+## System Architecture
+
+Here is the high-level system architecture of the ApexPulse platform, detailing how the Next.js frontend client, Express backend proxy cache, Yahoo Finance, and Google Finance components interact:
+
+![ApexPulse Architecture](https://i.ibb.co/SwJrsgY8/apexpulse-architecture.jpg)
+
+---
+
 ## Getting Started
 
 ### Prerequisites
