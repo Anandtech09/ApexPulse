@@ -6,14 +6,13 @@ const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
 });
-
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "ApexPulse | Dynamic Portfolio Analytics",
+  title: "ApexPulse: | Dynamic Portfolio Analytics",
   description: "Real-time stock portfolio tracker featuring live pricing feeds from Yahoo Finance and scraped fundamentals from Google Finance.",
 };
 

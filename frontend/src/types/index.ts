@@ -1,4 +1,4 @@
-// ─── Generic API wrapper ───────────────────────────────────────────
+// Generic API wrapper
 
 export interface ApiResponse<T = unknown> {
   success: boolean;

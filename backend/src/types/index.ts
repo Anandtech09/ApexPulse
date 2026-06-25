@@ -28,10 +28,10 @@ export interface Holding {
 // Live Data
 export interface QuoteData {
   ticker: string;
-  cmp: number;             // Current Market Price
-  change: number;          // Absolute change from previous close
-  changePercent: number;   // % change from previous close
-  fetchedAt: number;       // Unix ms timestamp
+  cmp: number;
+  change: number;
+  changePercent: number;
+  fetchedAt: number;
   marketCap: number | null;
   bookValue: number | null;
   priceToBook: number | null;

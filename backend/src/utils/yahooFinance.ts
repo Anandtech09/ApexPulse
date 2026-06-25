@@ -19,16 +19,7 @@ function isCacheFresh(): boolean {
 
 // Main fetch function
 
-/**
- * Fetches live current market prices for all given tickers in one
- * batched request to yahoo-finance2.
- *
- * Timeout and locale are read from config (env vars):
- *   YAHOO_FINANCE_TIMEOUT, YAHOO_FINANCE_LANG, YAHOO_FINANCE_REGION
- *
- * Results are cached for CACHE_TTL_PRICES ms (default 60s).
- * On failure, returns the last cached data with stale=true.
- */
+// batches all tickers in one shot — yahoo-finance2 handles the array natively
 export async function fetchPrices(
   tickers: string[]
 ): Promise<{ data: Record<string, QuoteData>; stale: boolean }> {
@@ -64,6 +55,8 @@ export async function fetchPrices(
 
     const result: Record<string, QuoteData> = {};
     const now = Date.now();
+    // yahoo returns a single object (not array) when you pass exactly 1 ticker
+    // cost me 2 hours — hence the Array.isArray check
     const quoteArray = Array.isArray(raw) ? raw : [raw];
 
     for (const q of quoteArray) {

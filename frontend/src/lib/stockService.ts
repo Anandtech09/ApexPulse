@@ -9,6 +9,7 @@ export async function getLivePrices(): Promise<ApiResponse<Record<string, QuoteD
   return api.get<ApiResponse<Record<string, QuoteData>>>("/stocks/prices");
 }
 
+
 export async function getFundamentals(): Promise<ApiResponse<Record<string, FundamentalsData>>> {
   return api.get<ApiResponse<Record<string, FundamentalsData>>>("/stocks/fundamentals");
 }
