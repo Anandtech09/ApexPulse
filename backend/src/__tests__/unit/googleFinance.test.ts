@@ -1,3 +1,11 @@
+const mockQuote = jest.fn().mockResolvedValue([]);
+
+jest.mock("yahoo-finance2", () => {
+  return jest.fn().mockImplementation(() => ({
+    quote: mockQuote,
+  }));
+});
+
 import axios from "axios";
 import { clearFundamentalsCache } from "../../utils/googleFinance";
 
@@ -91,5 +99,27 @@ describe("fetchAllFundamentals", () => {
 
     expect(result.data["NSE:HDFCBANK"].fetchedAt).toBeGreaterThanOrEqual(before);
     expect(result.data["NSE:HDFCBANK"].fetchedAt).toBeLessThanOrEqual(after);
+  });
+
+  it("uses the batched Yahoo Finance fallback when Google Finance scraping fails", async () => {
+    const { fetchAllFundamentals } = await import("../../utils/googleFinance");
+    
+    // Scraper returns no data (null)
+    mockedAxios.get.mockResolvedValue({ data: emptyHtml });
+    
+    // Mock Yahoo Finance to return data for HDFCBANK.NS
+    mockQuote.mockResolvedValueOnce([
+      {
+        symbol: "HDFCBANK.NS",
+        trailingPE: 22.4,
+        epsTrailingTwelveMonths: 80.5,
+      }
+    ]);
+
+    const result = await fetchAllFundamentals(["NSE:HDFCBANK"]);
+
+    expect(result.data["NSE:HDFCBANK"].peRatio).toBe(22.4);
+    expect(result.data["NSE:HDFCBANK"].latestEarnings).toBe(80.5);
+    expect(mockQuote).toHaveBeenCalledWith(["HDFCBANK.NS"], {}, expect.any(Object));
   });
 });

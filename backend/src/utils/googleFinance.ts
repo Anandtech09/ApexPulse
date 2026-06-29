@@ -20,17 +20,11 @@ function isCacheFresh(): boolean {
   return Date.now() - cache.fetchedAt < config.cache.fundamentalsTtl;
 }
 
-// ── HTML scraping helpers ──────────────────────────────────────────
+// HTML scraping helpers
 
 /**
  * Fetches P/E ratio and latest earnings for a single stock from
  * Google Finance. Returns null for either field if scraping fails.
- *
- * googleTicker format: "NSE:HDFCBANK"
- *
- * Scraper settings are read from config (env vars):
- *   GOOGLE_FINANCE_BASE_URL, GOOGLE_FINANCE_USER_AGENT,
- *   GOOGLE_FINANCE_ACCEPT_LANGUAGE, GOOGLE_FINANCE_TIMEOUT
  */
 async function fetchOneFundamentals(
   googleTicker: string
@@ -95,43 +89,10 @@ async function fetchOneFundamentals(
     );
   }
 
-  // ── Yahoo Finance Fallback ─────────────────────────────────────────
-  if (result.peRatio === null || result.latestEarnings === null) {
-    const holding = holdings.find((h) => h.googleTicker === googleTicker);
-    const yahooTicker = holding?.ticker;
-    if (yahooTicker) {
-      try {
-        const quote = await yahooFinance.quote(
-          yahooTicker,
-          {},
-          {
-            fetchOptions: {
-              headers: {
-                "User-Agent":
-                  config.googleFinance.userAgent,
-              },
-            },
-          }
-        );
-        if (result.peRatio === null && quote && typeof quote.trailingPE === "number") {
-          result.peRatio = quote.trailingPE;
-        }
-        if (result.latestEarnings === null && quote && typeof quote.epsTrailingTwelveMonths === "number") {
-          result.latestEarnings = quote.epsTrailingTwelveMonths;
-        }
-      } catch (yahooErr) {
-        console.warn(
-          `[googleFinance] Yahoo fallback failed for ${yahooTicker}:`,
-          (yahooErr as Error).message
-        );
-      }
-    }
-  }
-
   return result;
 }
 
-// ── Concurrency limiter ────────────────────────────────────────────
+// Concurrency limiter
 
 /**
  * Runs an array of async tasks in batches of `limit` at a time.
@@ -152,7 +113,7 @@ async function runInBatches<T>(
   return results;
 }
 
-// ── Main exported function ─────────────────────────────────────────
+// Main exported function
 
 /**
  * Fetches fundamentals for all provided Google Finance tickers.
@@ -176,6 +137,61 @@ export async function fetchAllFundamentals(
   for (const result of settled) {
     if (result.status === "fulfilled") {
       data[result.value.googleTicker] = result.value;
+    }
+  }
+
+  // Batched Yahoo Finance Fallback 
+  const missingYahooTickers: string[] = [];
+  const missingMapping: Record<string, string> = {}; // yahooTicker -> googleTicker
+
+  for (const googleTicker of googleTickers) {
+    const fundamentals = data[googleTicker];
+    if (!fundamentals || fundamentals.peRatio === null || fundamentals.latestEarnings === null) {
+      const holding = holdings.find((h) => h.googleTicker === googleTicker);
+      if (holding && holding.ticker) {
+        missingYahooTickers.push(holding.ticker);
+        missingMapping[holding.ticker] = googleTicker;
+      }
+    }
+  }
+
+  if (missingYahooTickers.length > 0) {
+    try {
+      const raw = await yahooFinance.quote(
+        missingYahooTickers,
+        {},
+        {
+          fetchOptions: {
+            headers: {
+              "User-Agent": config.googleFinance.userAgent,
+            },
+          },
+        }
+      ) as unknown as Array<{
+        symbol: string;
+        trailingPE?: number;
+        epsTrailingTwelveMonths?: number;
+      }>;
+
+      const quoteArray = Array.isArray(raw) ? raw : [raw];
+      for (const quote of quoteArray) {
+        if (!quote || !quote.symbol) continue;
+        const googleTicker = missingMapping[quote.symbol];
+        if (googleTicker && data[googleTicker]) {
+          const fundamentals = data[googleTicker];
+          if (fundamentals.peRatio === null && typeof quote.trailingPE === "number") {
+            fundamentals.peRatio = quote.trailingPE;
+          }
+          if (fundamentals.latestEarnings === null && typeof quote.epsTrailingTwelveMonths === "number") {
+            fundamentals.latestEarnings = quote.epsTrailingTwelveMonths;
+          }
+        }
+      }
+    } catch (yahooErr) {
+      console.warn(
+        `[googleFinance] Batched Yahoo fallback failed for tickers [${missingYahooTickers.join(", ")}]:`,
+        (yahooErr as Error).message
+      );
     }
   }
 
