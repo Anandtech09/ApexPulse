@@ -61,7 +61,7 @@ export const holdings: Holding[] = [
   {
     id: "savani-financials",
     name: "Savani Financials",
-    ticker: "SAVANIFINL.NS",
+    ticker: "511577.BO",
     googleTicker: "NSE:SAVANIFINL",
     exchange: "NSE",
     exchangeCode: "511577",
@@ -87,7 +87,7 @@ export const holdings: Holding[] = [
   {
     id: "ltimindtree",
     name: "LTI Mindtree",
-    ticker: "LTIM.NS",
+    ticker: "LTM.NS",
     googleTicker: "NSE:LTIM",
     exchange: "NSE",
     exchangeCode: "LTIM",
@@ -360,7 +360,7 @@ export const holdings: Holding[] = [
   {
     id: "happiest-minds",
     name: "Happiest Minds",
-    ticker: "HAPPIESTMIN.NS",
+    ticker: "HAPPSTMNDS.NS",
     googleTicker: "NSE:HAPPIESTMIN",
     exchange: "NSE",
     exchangeCode: "543237",
