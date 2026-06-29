@@ -5,7 +5,6 @@
  * scattering them across components.
  */
 
-// ── Sector colour palette ──────────────────────────────────────────────────
 // Used by PortfolioDonut and GainLossBar charts. Each key is the `sector`
 export const SECTOR_COLORS: Record<string, string> = {
   Financial:           "#6366f1", // Indigo
@@ -19,7 +18,7 @@ export const SECTOR_COLORS: Record<string, string> = {
 
 export const SECTOR_COLOR_DEFAULT = "#94a3b8"; // Slate — fallback for unknown sectors
 
-// ── Gain / Loss chart colours ─────────────────────────────────────────────
+// Gain / Loss chart colours
 export const CHART_COLORS = {
   gain:       "#10b981", // Emerald-500
   loss:       "#ef4444", // Red-500
@@ -36,14 +35,14 @@ export const CHART_COLORS = {
   },
 };
 
-// ── Exchange filter options ────────────────────────────────────────────────
+// Exchange filter options
 export const EXCHANGE_FILTER_OPTIONS = [
   { value: "All", label: "All Exchanges" },
   { value: "NSE", label: "NSE Only" },
   { value: "BSE", label: "BSE Only" },
 ] as const;
 
-// ── Logo / Favicon service ─────────────────────────────────────────────────
+// Logo / Favicon service
 
 export const FAVICON_BASE_URL = process.env.NEXT_PUBLIC_FAVICON_BASE_URL;
 export const FAVICON_SIZE = 32; // px — the `sz` query param
@@ -54,7 +53,6 @@ export function getFaviconUrl(domain: string): string {
   return `${FAVICON_BASE_URL}?sz=${FAVICON_SIZE}&domain=${domain}`;
 }
 
-// ── Stage-2 badge mapping ─────────────────────────────────────────────────
 // Maps the `stage2` string value from the backend to the Badge variant prop.
 export const STAGE2_BADGE_VARIANT: Record<string, "success" | "danger" | "default"> = {
   Yes: "success",
@@ -62,7 +60,6 @@ export const STAGE2_BADGE_VARIANT: Record<string, "success" | "danger" | "defaul
 };
 export const STAGE2_BADGE_DEFAULT_VARIANT = "default" as const;
 
-// ── Auto-refresh intervals ─────────────────────────────────────────────────
 export const REFRESH_INTERVALS = {
   prices:       15_000,  // 15 seconds
   fundamentals: 3_600_000, // 1 hour

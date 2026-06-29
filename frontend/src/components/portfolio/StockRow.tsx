@@ -66,11 +66,8 @@ export const StockRow: React.FC<StockRowProps> = React.memo(({
   const isProfit = gainLoss >= 0;
   const isDayGain = priceChange >= 0;
 
-  // Logo URL is resolved server-side: backend supplies the `domain` field per
-  // holding, so the frontend never needs a local domain-to-stock mapping.
+  // Logo url
   const logoUrl = domain ? getFaviconUrl(domain) : null;
-
-  // stage2Variant removed since stage-2 trend is no longer in Holdings static data
 
   return (
     <>
@@ -96,7 +93,6 @@ export const StockRow: React.FC<StockRowProps> = React.memo(({
               {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
             </span>
             {logoUrl && (
-              /* eslint-disable-next-line @next/next/no-img-element */
               <img
                 src={logoUrl}
                 alt=""
